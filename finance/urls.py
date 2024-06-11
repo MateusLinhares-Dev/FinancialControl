@@ -1,7 +1,6 @@
 from django.urls import path
-from finance.views import finance_view, finance_create
+from finance.service_soap import service_soap_balance
 
 urlpatterns = [
-    path('money/', finance_view, name='money_list_view'),
-    path('money/create/', finance_create, name='money_create_view'),
+    path('balance/', service_soap_balance, name='money_list_view'),
 ]

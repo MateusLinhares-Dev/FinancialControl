@@ -2,7 +2,8 @@ from django.http import HttpResponse
 from userFinance.models import UserFinance
 from django.views.decorators.csrf import csrf_exempt
 from lxml import etree
-   
+
+@csrf_exempt
 def soap_service_user(request):
     if request.method == "GET":
         users = UserFinance.objects.all()
@@ -20,6 +21,28 @@ def soap_service_user(request):
         response_xml = etree.tostring(envelope, pretty_print=True, xml_declaration=True, encoding="UTF-8")
         return HttpResponse(response_xml, content_type='text/xml')
     
+    if request.method == "POST":
+        envelope = etree.fromstring(request.body)
+        operation = envelope.find('.//{http://example.com/soap/}infoUser')
+
+        if operation is not None:
+            name = operation.find('name').text
+            birthday = operation.find('birthday').text
+            save_user = UserFinance(name=name, birthday=birthday)
+            save_user.save()
+
+            response = f"""
+             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                <soapenv:Body>
+                    <addUser xmlns="http://example.com/soap/">
+                        <id>{save_user.id}</id>
+                        <name>{name}</name>
+                        <birthday>{birthday}</birthday>
+                    </addUser>
+                </soapenv:Body>
+            </soapenv:Envelope>
+            """
+            return HttpResponse(response, content_type='text/xml')
     return HttpResponse("Invalid request method.", status=405)
 
 
@@ -44,7 +67,6 @@ def soap_service_user_detail(request):
             """
             return HttpResponse(response, content_type='text/xml')
         return HttpResponse("Invalid SOAP OPERATION.", status=400)
-    return HttpResponse("Method invalid, required 'POST'. ", status=404)
 
         
 
