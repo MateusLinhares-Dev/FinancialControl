@@ -51,6 +51,7 @@ def soap_service_user_detail(request):
     if request.method == "POST":
         envelope = etree.fromstring(request.body)
         operation = envelope.find('.//{http://example.com/soap/}add')
+        
         if operation is not None:
             id = operation.find('id').text
             user = UserFinance.objects.get(id=id)
