@@ -1,10 +1,12 @@
 from django.http import HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import ProtectedError
 from userFinance.models import UserFinance
 from django.views.decorators.csrf import csrf_exempt
 from lxml import etree
 
 @csrf_exempt
-def soap_service_user(request):
+def user_soap_review_insert(request):
     if request.method == "GET":
         users = UserFinance.objects.all()
 
@@ -47,8 +49,8 @@ def soap_service_user(request):
 
 
 @csrf_exempt
-def soap_service_user_detail(request):
-    if request.method == "POST":
+def user_soap_detail_update_delete(request):
+    if request.method == 'POST':
         envelope = etree.fromstring(request.body)
         operation = envelope.find('.//{http://example.com/soap/}add')
         
@@ -67,10 +69,39 @@ def soap_service_user_detail(request):
             </soapenv:Envelope>
             """
             return HttpResponse(response, content_type='text/xml')
-        return HttpResponse("Invalid SOAP OPERATION.", status=400)
+        return HttpResponse("Invalid SOAP OPERATION.", status=405)
+    
+    if request.method == 'DELETE':
+        envelope = etree.fromstring(request.body)
+        operation = envelope.find('.//{http://user.com/soap/}Delete')
+
+        if operation is not None:
+            delete_id = operation.find('id').text
+
+        try:
+            user_view = UserFinance.objects.get(id=delete_id)
+
+        except ObjectDoesNotExist:
+
+            return HttpResponse("Invalid ID user, doesn't exist", status=404)
+
+        try:
+            user_view.delete()
+
+            return HttpResponse("Record deleted successfully!", content_type="txt/xml")
+        
+        except ProtectedError:
+                
+                return HttpResponse("This user has records, delete them!", status=404)
+
+
 
         
 
 def wsdl_view(request):
-    wsdl_content = open('userFinance/wsdl.xml').read()
-    return HttpResponse(wsdl_content, content_type='text/xml')
+
+    if request.method == 'GET':
+        wsdl_content = open('userFinance/wsdl.xml').read()
+        return HttpResponse(wsdl_content, content_type='text/xml')
+    
+    return HttpResponse("Invalid method", status=405)

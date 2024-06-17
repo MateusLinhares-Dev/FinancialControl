@@ -2,13 +2,13 @@
              xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
              xmlns:xs="http://www.w3.org/2001/XMLSchema"
              xmlns:tns="http://example.com/soap/"
-             name="UserService"
+             name="FinanceService"
              targetNamespace="http://example.com/soap/">
   
   <!-- Define tipos de dados -->
   <types>
     <xs:schema targetNamespace="http://example.com/soap/">
-      <xs:element name="getUserDetail" type="tns:getUserDetail"/>
+      <xs:element name="getBalanceFinancialRequest" type="tns:getBalanceFinancialRequest"/>
       <xs:element name="getBalanceFinancialResponse" type="tns:getBalanceFinancialResponse"/>
       <xs:element name="addUserRequest" type="tns:addUserRequest"/>
       <xs:element name="addUserResponse" type="tns:addUserResponse"/>

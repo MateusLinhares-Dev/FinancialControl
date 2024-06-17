@@ -123,3 +123,11 @@ def soap_delete_update(request):
 
             return HttpResponse(response_xml, status=201, content_type="txt/xml")
     return HttpResponse("INVALID METHOD", status=404)
+
+def soap_wsdl_get(request):
+
+    if request.method == 'GET':
+        wsdl_content = open('finance/wsdl.xml').read()
+        return HttpResponse(wsdl_content, content_type = 'text/xml')
+    
+    return HttpResponse("Invalid method", status=405)

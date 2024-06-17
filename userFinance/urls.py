@@ -1,8 +1,8 @@
 from django.urls import path
-from userFinance.services_soap import soap_service_user, wsdl_view, soap_service_user_detail
+from userFinance.services_soap import user_soap_review_insert, wsdl_view, user_soap_detail_update_delete
 
 urlpatterns= [
-    path('soap/users/', soap_service_user ),
-    path('soap/users/detail/', soap_service_user_detail),
+    path('soap/users/', user_soap_review_insert ),
+    path('soap/users/detail/', user_soap_detail_update_delete),
     path('soap/userswsdl/', wsdl_view)
 ]
