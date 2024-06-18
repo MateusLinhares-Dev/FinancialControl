@@ -1,186 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
              xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-             xmlns:xs="http://www.w3.org/2001/XMLSchema"
              xmlns:tns="http://example.com/soap/"
-             name="UserService"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
              targetNamespace="http://example.com/soap/">
-  
-  <!-- Define tipos de dados -->
-  <types>
-    <xs:schema targetNamespace="http://example.com/soap/">
-      <xs:element name="getUserDetail" type="tns:getUserDetail"/>
-      <xs:element name="getBalanceFinancialResponse" type="tns:getBalanceFinancialResponse"/>
-      <xs:element name="addUserRequest" type="tns:addUserRequest"/>
-      <xs:element name="addUserResponse" type="tns:addUserResponse"/>
-      <xs:element name="deleteUserRequest" type="tns:deleteUserRequest"/>
-      <xs:element name="deleteUserResponse" type="tns:deleteUserResponse"/>
-      <xs:element name="updateUserRequest" type="tns:updateUserRequest"/>
-      <xs:element name="updateUserResponse" type="tns:updateUserResponse"/>
-      
-      <xs:complexType name="getBalanceFinancialRequest"/>
-      
-      <xs:complexType name="getBalanceFinancialResponse">
-        <xs:sequence>
-          <xs:element name="Balance" maxOccurs="unbounded">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="id" type="xs:string"/>
-                <xs:element name="balance" type="xs:string"/>
-                <xs:element name="user" type="xs:string"/>
-                <xs:element name="money" type="xs:string"/>
-                <xs:element name="description" type="xs:string"/>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-      
-      <xs:complexType name="addUserRequest">
-        <xs:sequence>
-          <xs:element name="valueInsert" type="xs:string"/>
-          <xs:element name="user" type="xs:string"/>
-          <xs:element name="money" type="xs:string"/>
-          <xs:element name="description" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      
-      <xs:complexType name="addUserResponse">
-        <xs:sequence>
-          <xs:element name="id" type="xs:string"/>
-          <xs:element name="valueInsert" type="xs:string"/>
-          <xs:element name="user" type="xs:string"/>
-          <xs:element name="money" type="xs:string"/>
-          <xs:element name="description" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      
-      <xs:complexType name="deleteUserRequest">
-        <xs:sequence>
-          <xs:element name="id" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      
-      <xs:complexType name="deleteUserResponse">
-        <xs:sequence>
-          <xs:element name="message" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      
-      <xs:complexType name="updateUserRequest">
-        <xs:sequence>
-          <xs:element name="id" type="xs:string"/>
-          <xs:element name="valueInsert" type="xs:string" minOccurs="0"/>
-          <xs:element name="user" type="xs:string" minOccurs="0"/>
-          <xs:element name="money" type="xs:string" minOccurs="0"/>
-          <xs:element name="description" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
-      </xs:complexType>
-      
-      <xs:complexType name="updateUserResponse">
-        <xs:sequence>
-          <xs:element name="id" type="xs:string"/>
-          <xs:element name="valueInsert" type="xs:string"/>
-          <xs:element name="user" type="xs:string"/>
-          <xs:element name="money" type="xs:string"/>
-          <xs:element name="description" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-    </xs:schema>
-  </types>
-  
-  <!-- Define mensagens -->
-  <message name="getBalanceFinancialRequest"/>
-  <message name="getBalanceFinancialResponse">
-    <part name="parameters" element="tns:getBalanceFinancialResponse"/>
-  </message>
-  
-  <message name="addUserRequest">
-    <part name="parameters" element="tns:addUserRequest"/>
-  </message>
-  <message name="addUserResponse">
-    <part name="parameters" element="tns:addUserResponse"/>
-  </message>
-  
-  <message name="deleteUserRequest">
-    <part name="parameters" element="tns:deleteUserRequest"/>
-  </message>
-  <message name="deleteUserResponse">
-    <part name="parameters" element="tns:deleteUserResponse"/>
-  </message>
-  
-  <message name="updateUserRequest">
-    <part name="parameters" element="tns:updateUserRequest"/>
-  </message>
-  <message name="updateUserResponse">
-    <part name="parameters" element="tns:updateUserResponse"/>
-  </message>
-  
-  <!-- Define operações -->
-  <portType name="FinanceServicePortType">
-    <operation name="getBalanceFinancial">
-      <input message="tns:getBalanceFinancialRequest"/>
-      <output message="tns:getBalanceFinancialResponse"/>
-    </operation>
-    <operation name="addUser">
-      <input message="tns:addUserRequest"/>
-      <output message="tns:addUserResponse"/>
-    </operation>
-    <operation name="deleteUser">
-      <input message="tns:deleteUserRequest"/>
-      <output message="tns:deleteUserResponse"/>
-    </operation>
-    <operation name="updateUser">
-      <input message="tns:updateUserRequest"/>
-      <output message="tns:updateUserResponse"/>
-    </operation>
-  </portType>
-  
-  <!-- Define bindings -->
-  <binding name="FinanceServiceBinding" type="tns:FinanceServicePortType">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <operation name="getBalanceFinancial">
-      <soap:operation soapAction="http://example.com/soap/getBalanceFinancial"/>
-      <input>
-        <soap:body use="literal"/>
-      </input>
-      <output>
-        <soap:body use="literal"/>
-      </output>
-    </operation>
-    <operation name="addUser">
-      <soap:operation soapAction="http://example.com/soap/addUser"/>
-      <input>
-        <soap:body use="literal"/>
-      </input>
-      <output>
-        <soap:body use="literal"/>
-      </output>
-    </operation>
-    <operation name="deleteUser">
-      <soap:operation soapAction="http://example.com/soap/deleteUser"/>
-      <input>
-        <soap:body use="literal"/>
-      </input>
-      <output>
-        <soap:body use="literal"/>
-      </output>
-    </operation>
-    <operation name="updateUser">
-      <soap:operation soapAction="http://example.com/soap/updateUser"/>
-      <input>
-        <soap:body use="literal"/>
-      </input>
-      <output>
-        <soap:body use="literal"/>
-      </output>
-    </operation>
-  </binding>
-  
-  <!-- Define serviço -->
-  <service name="FinanceService">
-    <port name="FinanceServicePort" binding="tns:FinanceServiceBinding">
-      <soap:address location="http://yourserver.com/soap"/>
-    </port>
-  </service>
-  
+    
+    <!-- Data Types -->
+    <types>
+        <xsd:schema targetNamespace="http://example.com/soap/">
+            <xsd:element name="getUsersRequest" type="xsd:string"/>
+            <xsd:element name="getUsersResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="User" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="id" type="xsd:int"/>
+                                    <xsd:element name="name" type="xsd:string"/>
+                                    <xsd:element name="birthday" type="xsd:string"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="addUserRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="name" type="xsd:string"/>
+                        <xsd:element name="birthday" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="addUserResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="id" type="xsd:int"/>
+                        <xsd:element name="name" type="xsd:string"/>
+                        <xsd:element name="birthday" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="updateUserRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="id" type="xsd:int"/>
+                        <xsd:element name="name" type="xsd:string"/>
+                        <xsd:element name="birthday" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="updateUserResponse" type="xsd:string"/>
+            <xsd:element name="deleteUserRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="id" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="deleteUserResponse" type="xsd:string"/>
+        </xsd:schema>
+    </types>
+
+    <!-- Messages -->
+    <message name="getUsersRequest">
+        <part name="parameters" element="tns:getUsersRequest"/>
+    </message>
+    <message name="getUsersResponse">
+        <part name="parameters" element="tns:getUsersResponse"/>
+    </message>
+    <message name="addUserRequest">
+        <part name="parameters" element="tns:addUserRequest"/>
+    </message>
+    <message name="addUserResponse">
+        <part name="parameters" element="tns:addUserResponse"/>
+    </message>
+    <message name="updateUserRequest">
+        <part name="parameters" element="tns:updateUserRequest"/>
+    </message>
+    <message name="updateUserResponse">
+        <part name="parameters" element="tns:updateUserResponse"/>
+    </message>
+    <message name="deleteUserRequest">
+        <part name="parameters" element="tns:deleteUserRequest"/>
+    </message>
+    <message name="deleteUserResponse">
+        <part name="parameters" element="tns:deleteUserResponse"/>
+    </message>
+
+    <!-- Port Type -->
+    <portType name="UserFinancePortType">
+        <operation name="getUsers">
+            <input message="tns:getUsersRequest"/>
+            <output message="tns:getUsersResponse"/>
+        </operation>
+        <operation name="addUser">
+            <input message="tns:addUserRequest"/>
+            <output message="tns:addUserResponse"/>
+        </operation>
+        <operation name="updateUser">
+            <input message="tns:updateUserRequest"/>
+            <output message="tns:updateUserResponse"/>
+        </operation>
+        <operation name="deleteUser">
+            <input message="tns:deleteUserRequest"/>
+            <output message="tns:deleteUserResponse"/>
+        </operation>
+    </portType>
+
+    <!-- Binding -->
+    <binding name="UserFinanceBinding" type="tns:UserFinancePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="getUsers">
+            <soap:operation soapAction="getUsers"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="addUser">
+            <soap:operation soapAction="addUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="updateUser">
+            <soap:operation soapAction="updateUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="deleteUser">
+            <soap:operation soapAction="deleteUser"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+
+    <!-- Service -->
+    <service name="UserFinanceService">
+        <port name="UserFinancePort" binding="tns:UserFinanceBinding">
+            <soap:address location="http://example.com/soap/"/>
+        </port>
+    </service>
 </definitions>

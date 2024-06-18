@@ -5,15 +5,17 @@ from finance.models import FinanceView
 from django.views.decorators.csrf import csrf_exempt
 from lxml import etree
 
-#create e read
 @csrf_exempt
 def soap_detail_create(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
+
     if request.method == "GET":
         balances = FinanceView.objects.all()
 
         envelope = etree.Element("{http://schemas.xmlsoap.org/soap/envelope/}Envelope")
         body = etree.SubElement(envelope,"{http://schemas.xmlsoap.org/soap/envelope}body")
-        response = etree.SubElement(body, "getBalanceFinancial", xlmns="http://example.com/soap/")
+        response = etree.SubElement(body, "getBalanceFinancial", xmlns="http://example.com/soap/")
 
         for balance in balances:
             balance_element = etree.SubElement(response, "Balance")
@@ -23,7 +25,7 @@ def soap_detail_create(request):
             etree.SubElement(balance_element, "money").text = str(balance.money)
             etree.SubElement(balance_element, "description").text = str(balance.description)
             
-        response_xml = etree.tostring(envelope, pretty_print=True, xml_declaration=True,encoding="UTF-8")
+        response_xml = etree.tostring(envelope, pretty_print=True, xml_declaration=True, encoding="UTF-8")
         return HttpResponse(response_xml, content_type='text/xml')
     
     if request.method == "POST":
@@ -67,9 +69,11 @@ def soap_detail_create(request):
         return HttpResponse(f"Invalid method - {request.method}", status=404)
 
 
-#Delete and update
 @csrf_exempt
 def soap_delete_update(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
+
     if request.method == "DELETE":
         envelope = etree.fromstring(request.body)
         operation = envelope.find('.//{http://balance.com/soap}Delete')
@@ -81,7 +85,7 @@ def soap_delete_update(request):
             finance_view = FinanceView.objects.get(id=delete_id)
             finance_view.delete()
             
-            return HttpResponse("Record deleted successfully!", content_type="txt/xml")
+            return HttpResponse("Record deleted successfully!", content_type="text/xml")
         
         except ObjectDoesNotExist:
             return HttpResponse("Invalid ID user, doesn't exist", status=404)   
@@ -109,7 +113,7 @@ def soap_delete_update(request):
             response_xml = f"""
                 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
                     <soapenv:Body>
-                        <addUser xmlns="http://example.com/soap/">
+                        <addUser xmlns="http://balance.com/soap/">
                             <id>{finance_view.id}</id>
                             <value_insert>{finance_view.valueInsert}</value_insert>
                             <user>{finance_view.user}</user>
@@ -121,13 +125,15 @@ def soap_delete_update(request):
                 """  
             
 
-            return HttpResponse(response_xml, status=201, content_type="txt/xml")
+            return HttpResponse(response_xml, status=201, content_type="text/xml")
     return HttpResponse("INVALID METHOD", status=404)
 
 def soap_wsdl_get(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
 
     if request.method == 'GET':
         wsdl_content = open('finance/wsdl.xml').read()
-        return HttpResponse(wsdl_content, content_type = 'text/xml')
+        return HttpResponse(wsdl_content, content_type='text/xml')
     
     return HttpResponse("Invalid method", status=405)

@@ -5,6 +5,7 @@ from userFinance.models import UserFinance
 from django.views.decorators.csrf import csrf_exempt
 from lxml import etree
 
+
 @csrf_exempt
 def user_soap_review_insert(request):
     if request.method == "GET":
@@ -93,10 +94,44 @@ def user_soap_detail_update_delete(request):
         except ProtectedError:
                 
                 return HttpResponse("This user has records, delete them!", status=404)
-
-
-
         
+    if request.method == 'PUT':
+        envelope = etree.fromstring(request.body)
+        operation = envelope.find(".//{http://user.com/soap/}update")
+
+        try:
+            user_finance = UserFinance.objects.get(id=operation[0].text)
+
+        except ObjectDoesNotExist:
+
+            return HttpResponse("Invalid ID user, doesn't exist", status=404)
+
+        if operation is not None:
+
+            for element in operation:
+                tag = element.tag
+                value_update = element.text
+
+                if hasattr(user_finance, tag):
+                    setattr(user_finance, tag, value_update)
+
+            user_finance.save()
+
+            response_xml = f"""
+                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                    <soapenv:Body>
+                        <addUser xmlns="http://user.com/soap/">
+                            <id>{user_finance.id}</id>
+                            <user>{user_finance.name}</user>
+                            <birthday>{user_finance.birthday}</birthday>
+                        </addUser>
+                    </soapenv:Body>
+                </soapenv:Envelope>
+                """ 
+            return HttpResponse(response_xml, status=201, content_type="txt/xml")
+        
+    return HttpResponse("INVALID METHOD", status=404)
+
 
 def wsdl_view(request):
 
