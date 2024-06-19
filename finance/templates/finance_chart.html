@@ -8,6 +8,39 @@
     body {
         font-family: 'Arial', sans-serif;
         background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .navbar {
+        background-color: #343a40;
+        padding: 10px 0;
+    }
+
+    .navbar-brand {
+        color: #fff;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .navbar-nav {
+        display: flex;
+        justify-content: center;
+    }
+
+    .nav-link {
+        color: #fff;
+        font-size: 18px;
+        margin: 0 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        color: #ffc107;
     }
 
     .container {
@@ -28,6 +61,14 @@
         margin-bottom: 20px;
     }
 
+    #totalDeposits {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #28a745;
+    }
+
     #financeChart {
         margin-top: 20px;
     }
@@ -35,6 +76,12 @@
 {% endblock %}
 
 {% block content %}
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="#">Sistema Financeiro</a>
+    </div>
+</nav>
+
 <div class="container">
     <h2>Gráfico de Finanças por Usuário</h2>
 
@@ -48,6 +95,8 @@
         </select>
     </div>
 
+    <div id="totalDeposits">Total Depositado: R$ 0,00</div>
+
     <canvas id="financeChart" width="400" height="200"></canvas>
 </div>
 
@@ -58,9 +107,23 @@
         return data;
     }
 
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
     async function initChart() {
         const financeData = await fetchFinanceData();
         const ctx = document.getElementById('financeChart').getContext('2d');
+
+        financeData.datasets.forEach(dataset => {
+            dataset.backgroundColor = getRandomColor();
+        });
+
         window.myChart = new Chart(ctx, {
             type: 'bar', // Tipo de gráfico de barras
             data: {
@@ -86,6 +149,17 @@
                             size: 18,
                             weight: 'bold'
                         }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            footer: (tooltipItems) => {
+                                let sum = 0;
+                                tooltipItems.forEach(function(tooltipItem) {
+                                    sum += tooltipItem.raw;
+                                });
+                                return 'Total: R$ ' + sum.toFixed(2);
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -107,6 +181,8 @@
                 }
             }
         });
+
+        updateTotalDeposits(financeData);
     }
 
     async function updateChart() {
@@ -114,9 +190,25 @@
         const userId = userSelect.value;
         const financeData = await fetchFinanceData(userId);
 
+        financeData.datasets.forEach(dataset => {
+            dataset.backgroundColor = getRandomColor();
+        });
+
         window.myChart.data.labels = financeData.labels;
         window.myChart.data.datasets = financeData.datasets;
         window.myChart.update();
+
+        updateTotalDeposits(financeData);
+    }
+
+    function updateTotalDeposits(financeData) {
+        let total = 0;
+        financeData.datasets.forEach(dataset => {
+            dataset.data.forEach(value => {
+                total += value;
+            });
+        });
+        document.getElementById('totalDeposits').textContent = 'Total Depositado: R$ ' + total.toFixed(2);
     }
 
     document.addEventListener('DOMContentLoaded', (event) => {
