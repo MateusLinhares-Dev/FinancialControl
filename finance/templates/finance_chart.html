@@ -1,0 +1,126 @@
+<!-- templates/finance_chart.html -->
+{% extends 'base.html' %}
+
+{% block title %}Gráfico de Finanças{% endblock %}
+
+{% block css %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    #financeChart {
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Gráfico de Finanças por Usuário</h2>
+
+    <div class="form-group">
+        <label for="userSelect">Filtrar por Usuário:</label>
+        <select id="userSelect" class="form-control" onchange="updateChart()">
+            <option value="">Todos os Usuários</option>
+            {% for user in users %}
+            <option value="{{ user.id }}">{{ user.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <canvas id="financeChart" width="400" height="200"></canvas>
+</div>
+
+<script>
+    async function fetchFinanceData(userId = '') {
+        const response = await fetch("{% url 'finance_data' %}?user=" + userId);
+        const data = await response.json();
+        return data;
+    }
+
+    async function initChart() {
+        const financeData = await fetchFinanceData();
+        const ctx = document.getElementById('financeChart').getContext('2d');
+        window.myChart = new Chart(ctx, {
+            type: 'bar', // Tipo de gráfico de barras
+            data: {
+                labels: financeData.labels,
+                datasets: financeData.datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribuição de Dinheiro Depositado por Usuário',
+                        font: {
+                            size: 18,
+                            weight: 'bold'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true, // Empilhar as barras horizontalmente
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        stacked: true, // Empilhar as barras verticalmente
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + value.toFixed(2); // Formatação para reais
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async function updateChart() {
+        const userSelect = document.getElementById('userSelect');
+        const userId = userSelect.value;
+        const financeData = await fetchFinanceData(userId);
+
+        window.myChart.data.labels = financeData.labels;
+        window.myChart.data.datasets = financeData.datasets;
+        window.myChart.update();
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        initChart();
+    });
+</script>
+{% endblock %}
